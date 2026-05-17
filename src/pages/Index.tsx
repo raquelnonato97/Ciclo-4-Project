@@ -24,10 +24,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl border-none bg-white/80 backdrop-blur-sm">
+    <div className="min-h-screen bg-[#4A5D23] flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl border-none bg-white/95 backdrop-blur-sm">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
+          <div className="mx-auto bg-[#4A5D23] w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
             <PlusCircle className="text-white w-6 h-6" />
           </div>
           <CardTitle className="text-3xl font-bold tracking-tight text-gray-900">Nova Tarefa</CardTitle>
@@ -43,7 +43,7 @@ const Index = () => {
                 placeholder="O que precisa ser feito?"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="rounded-xl border-gray-200 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="rounded-xl border-gray-200 focus:ring-[#4A5D23] focus:border-[#4A5D23] transition-all"
                 required
               />
             </div>
@@ -53,13 +53,13 @@ const Index = () => {
                 placeholder="Adicione mais informações sobre a tarefa..."
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
-                className="min-h-[120px] rounded-xl border-gray-200 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
+                className="min-h-[120px] rounded-xl border-gray-200 focus:ring-[#4A5D23] focus:border-[#4A5D23] transition-all resize-none"
               />
             </div>
             <div className="flex flex-col gap-3 pt-2">
               <Button 
                 type="submit" 
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-6 rounded-xl shadow-lg shadow-indigo-100 transition-all active:scale-[0.98]"
+                className="w-full bg-[#4A5D23] hover:bg-[#3A4D13] text-white font-semibold py-6 rounded-xl shadow-lg transition-all active:scale-[0.98]"
               >
                 Criar Tarefa e Ver Lista
               </Button>
@@ -67,7 +67,7 @@ const Index = () => {
                 type="button"
                 variant="ghost"
                 onClick={() => navigate("/tasks")}
-                className="w-full text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl py-6"
+                className="w-full text-gray-500 hover:text-[#4A5D23] hover:bg-gray-100 rounded-xl py-6"
               >
                 <ListTodo className="w-4 h-4 mr-2" />
                 Ver Tarefas Existentes
