@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, ArrowLeft, Calendar, CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { Trash2, ArrowLeft, Calendar, CheckCircle2, Circle, Loader2, Clock } from "lucide-react";
 import { useTasks } from "@/hooks/use-tasks";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -27,6 +27,17 @@ const TaskList = () => {
     };
     await updateTask(id, updates);
     showSuccess(!isCompleted ? "Tarefa concluída!" : "Tarefa reaberta.");
+  };
+
+  const handleDateChange = async (id: string, newDate: string) => {
+    if (!newDate) return;
+    try {
+      const isoDate = new Date(newDate).toISOString();
+      await updateTask(id, { data_conclusao: isoDate });
+      showSuccess("Data de conclusão atualizada!");
+    } catch (e) {
+      showError("Data inválida.");
+    }
   };
 
   if (loading) {
@@ -107,10 +118,17 @@ const TaskList = () => {
                           <Calendar className="w-3.5 h-3.5" />
                           Criada em: {format(new Date(task.data_criacao), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
                         </div>
-                        {task.data_conclusao && (
-                          <div className="flex items-center gap-1.5 text-green-600">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Encerrada em: {format(new Date(task.data_conclusao), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
+                        
+                        {task.status === 'concluido' && task.data_conclusao && (
+                          <div className="flex items-center gap-2 text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-100">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>Concluída em:</span>
+                            <input
+                              type="datetime-local"
+                              value={format(parseISO(task.data_conclusao), "yyyy-MM-dd'T'HH:mm")}
+                              onChange={(e) => handleDateChange(task.id, e.target.value)}
+                              className="bg-transparent border-none p-0 text-xs font-bold focus:outline-none cursor-pointer hover:underline"
+                            />
                           </div>
                         )}
                       </div>
