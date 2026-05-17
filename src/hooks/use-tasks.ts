@@ -10,7 +10,7 @@ export function useTasks() {
   const fetchTasks = async () => {
     try {
       const { data, error } = await supabase
-        .from('tarefas_IA_IV')
+        .from('tarefas_ia_iv')
         .select('*')
         .order('data_criacao', { ascending: false });
 
@@ -30,7 +30,7 @@ export function useTasks() {
   const addTask = async (titulo: string, detalhes: string) => {
     try {
       const { error } = await supabase
-        .from('tarefas_IA_IV')
+        .from('tarefas_ia_iv')
         .insert([{ 
           titulo, 
           detalhes, 
@@ -48,7 +48,7 @@ export function useTasks() {
   const updateTask = async (id: string, updates: Partial<Task>) => {
     try {
       const { error } = await supabase
-        .from('tarefas_IA_IV')
+        .from('tarefas_ia_iv')
         .update(updates)
         .eq('id', id);
 
@@ -62,7 +62,7 @@ export function useTasks() {
   const deleteTask = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('tarefas_IA_IV')
+        .from('tarefas_ia_iv')
         .delete()
         .eq('id', id);
 
