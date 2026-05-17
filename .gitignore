@@ -20,6 +20,9 @@ dist-ssr
 .env.production.local
 .env*.local
 
+# Dyad internal files (screenshots and metadata)
+.dyad/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
