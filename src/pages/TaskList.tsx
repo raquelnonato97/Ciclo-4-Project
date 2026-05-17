@@ -4,26 +4,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, ArrowLeft, Calendar, CheckCircle2, Circle } from "lucide-react";
+import { Trash2, ArrowLeft, Calendar, CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { useTasks } from "@/hooks/use-tasks";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { showSuccess, showError } from "@/utils/toast";
 
 const TaskList = () => {
-  const { tasks, updateTask, deleteTask } = useTasks();
+  const { tasks, loading, updateTask, deleteTask } = useTasks();
   const navigate = useNavigate();
 
-  const handleDelete = (id: string) => {
-    deleteTask(id);
+  const handleDelete = async (id: string) => {
+    await deleteTask(id);
     showError("Tarefa excluída permanentemente.");
   };
 
-  const toggleComplete = (id: string, currentStatus: string | null) => {
-    const completedAt = currentStatus ? null : new Date().toISOString();
-    updateTask(id, { completedAt });
-    showSuccess(completedAt ? "Tarefa concluída!" : "Tarefa reaberta.");
+  const toggleComplete = async (id: string, currentStatus: string) => {
+    const isCompleted = currentStatus === 'concluido';
+    const updates = {
+      status: isCompleted ? 'pendente' : 'concluido' as any,
+      data_conclusao: isCompleted ? null : new Date().toISOString()
+    };
+    await updateTask(id, updates);
+    showSuccess(!isCompleted ? "Tarefa concluída!" : "Tarefa reaberta.");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -59,15 +71,15 @@ const TaskList = () => {
         ) : (
           <div className="grid gap-4">
             {tasks.map((task) => (
-              <Card key={task.id} className={`overflow-hidden border-none shadow-sm transition-all hover:shadow-md ${task.completedAt ? 'bg-gray-50/50' : 'bg-white'}`}>
+              <Card key={task.id} className={`overflow-hidden border-none shadow-sm transition-all hover:shadow-md ${task.status === 'concluido' ? 'bg-gray-50/50' : 'bg-white'}`}>
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="flex-shrink-0 pt-1">
                       <button 
-                        onClick={() => toggleComplete(task.id, task.completedAt)}
+                        onClick={() => toggleComplete(task.id, task.status)}
                         className="transition-transform active:scale-90"
                       >
-                        {task.completedAt ? (
+                        {task.status === 'concluido' ? (
                           <CheckCircle2 className="w-7 h-7 text-green-500" />
                         ) : (
                           <Circle className="w-7 h-7 text-gray-300 hover:text-indigo-400" />
@@ -78,13 +90,13 @@ const TaskList = () => {
                     <div className="flex-grow space-y-4">
                       <div className="space-y-2">
                         <Input
-                          value={task.title}
-                          onChange={(e) => updateTask(task.id, { title: e.target.value })}
-                          className={`text-xl font-semibold border-none p-0 h-auto focus-visible:ring-0 bg-transparent ${task.completedAt ? 'line-through text-gray-400' : 'text-gray-900'}`}
+                          value={task.titulo}
+                          onChange={(e) => updateTask(task.id, { titulo: e.target.value })}
+                          className={`text-xl font-semibold border-none p-0 h-auto focus-visible:ring-0 bg-transparent ${task.status === 'concluido' ? 'line-through text-gray-400' : 'text-gray-900'}`}
                         />
                         <Textarea
-                          value={task.details}
-                          onChange={(e) => updateTask(task.id, { details: e.target.value })}
+                          value={task.detalhes}
+                          onChange={(e) => updateTask(task.id, { detalhes: e.target.value })}
                           className="text-gray-600 border-none p-0 min-h-[40px] focus-visible:ring-0 bg-transparent resize-none"
                           placeholder="Sem detalhes..."
                         />
@@ -93,12 +105,12 @@ const TaskList = () => {
                       <div className="flex flex-wrap gap-4 text-xs font-medium text-gray-400 pt-2 border-t border-gray-100">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5" />
-                          Criada em: {format(new Date(task.createdAt), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
+                          Criada em: {format(new Date(task.data_criacao), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
                         </div>
-                        {task.completedAt && (
+                        {task.data_conclusao && (
                           <div className="flex items-center gap-1.5 text-green-600">
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            Encerrada em: {format(new Date(task.completedAt), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
+                            Encerrada em: {format(new Date(task.data_conclusao), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
                           </div>
                         )}
                       </div>

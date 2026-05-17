@@ -1,36 +1,77 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Task } from '@/types/task';
+import { showError } from '@/utils/toast';
 
 export function useTasks() {
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem('tasks');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTasks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tarefas_IA_IV')
+        .select('*')
+        .order('data_criacao', { ascending: false });
+
+      if (error) throw error;
+      setTasks(data || []);
+    } catch (error: any) {
+      showError("Erro ao carregar tarefas: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
+    fetchTasks();
+  }, []);
 
-  const addTask = (title: string, details: string) => {
-    const newTask: Task = {
-      id: crypto.randomUUID(),
-      title,
-      details,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-    };
-    setTasks((prev) => [newTask, ...prev]);
+  const addTask = async (titulo: string, detalhes: string) => {
+    try {
+      const { error } = await supabase
+        .from('tarefas_IA_IV')
+        .insert([{ 
+          titulo, 
+          detalhes, 
+          status: 'pendente',
+          data_criacao: new Date().toISOString()
+        }]);
+
+      if (error) throw error;
+      await fetchTasks();
+    } catch (error: any) {
+      showError("Erro ao adicionar tarefa: " + error.message);
+    }
   };
 
-  const updateTask = (id: string, updates: Partial<Task>) => {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, ...updates } : task))
-    );
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+    try {
+      const { error } = await supabase
+        .from('tarefas_IA_IV')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+      await fetchTasks();
+    } catch (error: any) {
+      showError("Erro ao atualizar tarefa: " + error.message);
+    }
   };
 
-  const deleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+  const deleteTask = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tarefas_IA_IV')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+    } catch (error: any) {
+      showError("Erro ao excluir tarefa: " + error.message);
+    }
   };
 
-  return { tasks, addTask, updateTask, deleteTask };
+  return { tasks, loading, addTask, updateTask, deleteTask };
 }

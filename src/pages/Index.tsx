@@ -14,11 +14,11 @@ const Index = () => {
   const { addTask } = useTasks();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
     
-    addTask(title, details);
+    await addTask(title, details);
     showSuccess("Tarefa adicionada com sucesso!");
     navigate("/tasks");
   };
